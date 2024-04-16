@@ -26,22 +26,29 @@ module.exports.list = (req, res) => {
 module.exports.detail = (req, res) => {
     User.findById(req.params.id)
         .then(user => {
-            res.status(200).json(user);
+            if (!user) {
+                res.status(404).json("Error: User not found.");
+            } else {
+                res.status(200).json(user);
+            }
         })
-        .catch(err => {
-            res.status(404).json("Error: User not found.");
-        });
+        .catch(console.error);
 }
 
 // Update
 module.exports.update = (req, res) => {
-    User.findByIdAndUpdate (req.params.id, req.body, { new: true })
+    User.findByIdAndUpdate (req.params.id, req.body, { 
+        new: true, 
+        runValidators: true 
+    })
         .then(user => {
-            res.status(200).json(user);
+            if (!user) {
+                res.status(404).json("Error: User not found.");
+            } else {
+                res.status(200).json(user);
+            }
         })
-        .catch(err => {
-            res.status(404).json("Error: User not found.");
-        });
+        .catch(console.error);
 }
 
 // Delete
@@ -49,11 +56,9 @@ module.exports.delete = (req, res) => {
     User.findByIdAndDelete(req.params.id)
         .then(user => {
             if (!user) {
-                return res.status(404).json("Error: User not found.");
+                res.status(404).json("Error: User not found.");
             }
             res.status(204).end();
         })
-        .catch(err => {
-            res.status(500).json("Error: " + err.message);
-        });
+        .catch(console.error);
 }
