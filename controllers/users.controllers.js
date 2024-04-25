@@ -1,5 +1,4 @@
 const User = require("../models/user.model");
-const { sessions } = require("../middlewares/auth.middlewares");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -22,14 +21,34 @@ module.exports.create = async (req, res) => {
   } catch (err) {
     res.status(400).json(`Error: ${err.message}`);
   }
-  /* 
-  User.create(req.body)
-    .then((user) => {
-      res.status(201).json(user);
-    })
-    .catch((err) => {
-      res.status(400).json(`Error: ${err.message}`);
-    }); */
+};
+
+module.exports.login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json("Error: Email and password are required.");
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json("Error: Invalid credentials.");
+    } else {
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (isMatch) {
+        const token = jwt.sign(
+          { sub: user.id, exp: Date.now() / 1000 + 60 },
+          process.env.JWT_SECRET
+        );
+
+        res.status(200).json({ token: token });
+      } else {
+        res.status(401).json("Error: Password incorrect.");
+      }
+    }
+  } catch (err) {
+    res.status(400).json(`Error: ${err.message}`);
+  }
 };
 
 // Read
@@ -81,35 +100,4 @@ module.exports.delete = (req, res) => {
       res.status(204).end();
     })
     .catch(console.error);
-};
-
-module.exports.login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json("Error: Email and password are required.");
-    }
-
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json("Error: User not found.");
-    } else {
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (isMatch) {
-        const token = jwt.sign(
-          { userId: user.id },
-          process.env.JWT_SECRET || "secretKey",
-          { expiresIn: "1h" }
-        );
-
-        // sessions.push({ token, userId: user.id });
-
-        res.status(200).json({ token: token });
-      } else {
-        res.status(401).json("Error: Password incorrect.");
-      }
-    }
-  } catch (err) {
-    res.status(400).json(`Error: ${err.message}`);
-  }
 };

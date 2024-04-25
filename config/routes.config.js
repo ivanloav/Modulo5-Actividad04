@@ -16,8 +16,6 @@ router.use(checkAuth);
 // Read
 router.get("/api/posts", users.list);
 router.get("/api/posts/:id", users.detail);
-router.get("/api/users", users.list);
-router.get("/api/users/:id", users.detail);
 
 // Update
 router.patch("/api/posts/:id", users.update);

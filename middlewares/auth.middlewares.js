@@ -8,7 +8,7 @@ module.exports.checkAuth = async (req, res, next) => {
     return res.status(401).json({ message: "Unauthorized: No token provided" });
   }
 
-  const secret = process.env.JWT_SECRET || "secretKey";
+  const secret = process.env.JWT_SECRET;
 
   if (!secret) {
     return res
@@ -22,6 +22,6 @@ module.exports.checkAuth = async (req, res, next) => {
     next();
   } catch (err) {
     console.error("JWT Verification Error:", err);
-    return res.status(401).json({ message: "Unauthorized: Invalid token" });
+    return res.status(401).json({ message: err });
   }
 };
