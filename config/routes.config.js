@@ -7,6 +7,7 @@ const { checkAuth } = require("../middlewares/auth.middlewares");
 // Create
 router.post("/api/posts", users.create);
 router.post("/api/users", users.create);
+router.get("/api/users/verify", users.verify);
 
 // Login
 router.post("/api/login", users.login);
