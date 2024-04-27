@@ -67,7 +67,7 @@ module.exports.login = async (req, res) => {
       const isMatch = await bcrypt.compare(password, user.password);
       if (isMatch) {
         const token = jwt.sign(
-          { sub: user.id, exp: Date.now() / 1000 + 60 },
+          { sub: user.id, exp: Date.now() / 1000 + 30 },
           process.env.JWT_SECRET
         );
 
